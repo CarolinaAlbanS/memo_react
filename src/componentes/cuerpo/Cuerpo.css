@@ -1,0 +1,10 @@
+.cuerpo{
+    max-width: 100%;
+    justify-content: center;
+    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+}
