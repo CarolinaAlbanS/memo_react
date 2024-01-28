@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "../gallery/Gallery.css";
 import Planeta from "../Planeta/Planeta";
 
@@ -12,55 +12,63 @@ const Gallery = ({ cards }) => {
       resuelto: false,
     };
   });
-  const [colleccion, setColleccion] = useState(colleccionOriginal);
+  const [coleccion, setColeccion] = useState(colleccionOriginal);
   const [jugada, setJugada] = useState([]);
 
-  const cartaArriba = (info) => {
-    console.log(info);
-    let jugadaActual = [{ name: info.name, id: info.id }, ...jugada];
-    const nuevaColeccion = colleccion.map((planeta) => planeta);
+  const actualizar = (planetaClickado) => {
+    let jugadaActual = [planetaClickado, ...jugada];
 
-    if (jugadaActual.length == 2) {
-      if (
-        jugadaActual[0].name === jugadaActual[1]?.name &&
-        jugadaActual[0].id != jugadaActual[1]?.id
-      ) {
-        // bien
-        nuevaColeccion.forEach((planeta) => {
-          if (
-            planeta.id === jugadaActual[0].id ||
-            planeta.id === jugadaActual[1].id
-          ) {
-            planeta.resuelto = true;
-          }
-        });
+    planetaClickado.reverso = true;
+
+    if (jugadaActual.length === 2) {
+      const exito = jugadaExitosa(jugadaActual);
+      if (exito) {
+        const colecActualizada = actualizarPlanetasExito(
+          jugadaActual,
+          coleccion
+        );
+        setColeccion(colecActualizada);
       } else {
-        // mal
-        // dar la vuelta
+        setJugada([]);
+        setTimeout(() => {
+          const coleccionActualizada = ocultarPlanetas(coleccion);
+          setColeccion(coleccionActualizada);
+        }, 700);
       }
-      jugadaActual = [];
-    } else {
-      nuevaColeccion.forEach((planeta) =>
-        planeta.id == jugadaActual[0].id || planeta.id == jugadaActual[1]?.id
-          ? (planeta.reverso = true)
-          : false
-      );
+      return;
     }
 
     setJugada(jugadaActual);
-    actualizarPlaneta(nuevaColeccion);
   };
 
-  const actualizarPlaneta = (nuevaColeccion) => {
-    setColleccion(nuevaColeccion);
-    console.log(jugada);
+  const jugadaExitosa = (jugada) => {
+    const planeta1 = jugada[0];
+    const planeta2 = jugada[1];
+    return planeta1.name === planeta2.name && planeta1.id !== planeta2.id;
+  };
+
+  const ocultarPlanetas = (coleccion) => {
+    return coleccion.map((p) => {
+      return { ...p, reverso: false };
+    });
+  };
+
+  const actualizarPlanetasExito = (jugada, coleccion) => {
+    const planeta1 = jugada[0];
+    const planeta2 = jugada[1];
+    return coleccion.map((p) => {
+      if (p.id === planeta1.id || p.id === planeta2.id) {
+        return { ...p, resuelto: true };
+      }
+      return p;
+    });
   };
 
   return (
     <div className="car">
-      {colleccion.map((planeta, index) => (
+      {coleccion.map((planeta, index) => (
         <div className="planeta" key={index}>
-          <Planeta info={planeta} actualizar={cartaArriba}></Planeta>
+          <Planeta infoPlaneta={planeta} actualizar={actualizar}></Planeta>
         </div>
       ))}
     </div>
