@@ -16,32 +16,44 @@ const Gallery = ({ cards }) => {
   const [jugada, setJugada] = useState([]);
 
   const cartaArriba = (info) => {
-    const jugada2 = [{ name: info.name, id: info.id }, ...jugada];
-    //jugada.push({ name: info.name, id: info.id });
-    setJugada(jugada2);
-    console.log(jugada2);
-    console.log(jugada);
+    console.log(info);
+    let jugadaActual = [{ name: info.name, id: info.id }, ...jugada];
+    const nuevaColeccion = colleccion.map((planeta) => planeta);
 
-    if (jugada[0].name === jugada[1]?.name && jugada[0].id != jugada[1]?.id) {
-      // jugada correcta
-      info.resuelto = !info.resuelto;
-    } else if (jugada.length === 2) {
-      // reseteamos
-      info.reverso = !info.reverso;
+    if (jugadaActual.length == 2) {
+      if (
+        jugadaActual[0].name === jugadaActual[1]?.name &&
+        jugadaActual[0].id != jugadaActual[1]?.id
+      ) {
+        // bien
+        nuevaColeccion.forEach((planeta) => {
+          if (
+            planeta.id === jugadaActual[0].id ||
+            planeta.id === jugadaActual[1].id
+          ) {
+            planeta.resuelto = true;
+          }
+        });
+      } else {
+        // mal
+        // dar la vuelta
+      }
+      jugadaActual = [];
+    } else {
+      nuevaColeccion.forEach((planeta) =>
+        planeta.id == jugadaActual[0].id || planeta.id == jugadaActual[1]?.id
+          ? (planeta.reverso = true)
+          : false
+      );
     }
 
-    info.reverso = true;
-    actualizarPlaneta(info);
-
-    console.log(jugada);
+    setJugada(jugadaActual);
+    actualizarPlaneta(nuevaColeccion);
   };
 
-  const actualizarPlaneta = (planeta) => {
-    const index = colleccion.findIndex((p) => p.id === planeta.id);
-    console.log(index);
-    colleccion[index] = planeta;
-    console.log(colleccion);
-    setColleccion(colleccion);
+  const actualizarPlaneta = (nuevaColeccion) => {
+    setColleccion(nuevaColeccion);
+    console.log(jugada);
   };
 
   return (
